@@ -52,7 +52,7 @@ function shareHref() {
   const where = CONFIG.venue ? ` at ${CONFIG.venue}` : ' at home';
   const text = `Karibu nyumbani! The family of ${CONFIG.grandfather} & ${CONFIG.grandmother} is gathering${where}: ${CONFIG.date}.\n`
     + `Tap to say if you're coming: ${pageUrl()}\n`
-    + 'Please forward to everyone in your household.';
+    + "Please forward to relatives you haven't counted in your own reply, so nobody is counted twice.";
   return 'https://wa.me/?text=' + encodeURIComponent(text);
 }
 
