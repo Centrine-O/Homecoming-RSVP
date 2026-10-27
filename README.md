@@ -2,7 +2,7 @@
 
 A no-login RSVP page shared as one WhatsApp link. Replies land in a Google Sheet the hosts can open in Sheets or download as Excel. Costs nothing to run.
 
-- **Page:** static HTML/CSS/JS in `web/`, hosted on GitHub Pages
+- **Page:** static HTML/CSS/JS in `web/`, live at **https://ongaria-homecoming.netlify.app**
 - **API:** one Google Apps Script web app, `backend/Code.gs`
 - **Data:** one Google Sheet, with `RSVPs` (one row per person) and `Summary` (formulas)
 
@@ -12,7 +12,7 @@ The full spec is in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
 ```sh
 npm test          # business rules + backend, no dependencies
-npm run serve     # http://localhost:8080
+npm run dev       # http://localhost:8080 (stop with Ctrl+C)
 ```
 
 While `apiUrl` in `web/config.js` is empty, the page runs in **preview mode**: a banner shows, and replies are saved in the browser only.
@@ -24,6 +24,8 @@ Event details are in `web/config.js`, filled in from the answers recorded in sec
 The link preview text is in the `og:` tags in `web/index.html`, because WhatsApp reads them without running JavaScript. The preview card is `web/og-image.jpg` (1200×630). The page photo is `web/homestead.webp` / `.jpg`, cropped and compressed from the original in `assets/homestead-original.jpg` (not published).
 
 ## 2. Create the backend (one time)
+
+The live backend was set up without clasp: create a Google Sheet, open Extensions → Apps Script, paste in all of `backend/Code.gs`, save, then follow steps 2–4 below. clasp is optional:
 
 ```sh
 npm i -g @google/clasp
@@ -52,14 +54,15 @@ clasp push
 
 4. Deploy → **New deployment** → type **Web app**, with Execute as: **Me** and Who has access: **Anyone**. Copy the `/exec` URL into `apiUrl` in `web/config.js`.
 
-**Updating the backend later:** run `clasp push`, then Deploy → Manage deployments → Edit (pencil) → Version: **New version**. This keeps the same URL.
+**Updating the backend later:** paste the new `Code.gs` into the editor and save (or run `clasp push`), then Deploy → Manage deployments → Edit (pencil) → Version: **New version** → Deploy. This keeps the same URL. Making a *new deployment* instead gives a new URL, which then has to go into `apiUrl`.
 
 ## 3. Host the page
 
-1. Push to `main` on GitHub.
-2. In the repo, go to Settings → Pages → Source: **GitHub Actions**. The workflow in `.github/workflows/pages.yml` runs the tests, then publishes `web/`.
-3. The page is served at https://centrine-o.github.io/Homecoming-RSVP/. If the address differs, update `og:url`, `og:image` and `siteUrl`.
-4. Paste the link into a WhatsApp chat with yourself to check the preview card.
+The page is hosted on Netlify, connected to this GitHub repo. `netlify.toml` tells Netlify to run `npm test` and publish `web/`, so every push to `main` goes live within a minute or two, and a push with failing tests does not.
+
+If the address ever changes, update `og:url` and `og:image` in `web/index.html` and `siteUrl` in `web/config.js`.
+
+(`.github/workflows/pages.yml` is for GitHub Pages, which is unused while the GitHub account's Actions are unavailable.)
 
 ## 4. Before sharing
 

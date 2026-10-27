@@ -25,5 +25,5 @@ export default {
   apiUrl: 'https://script.google.com/macros/s/AKfycbwUqcEBpskePpFLpmXhzCGfnS5njbicf-JAuxeJHl6tDF-v_DN9U-7T5bWnt8aZ3lu4Pw/exec',
 
   // The public link people share. Empty = the address the page was opened from.
-  siteUrl: 'https://centrine-o.github.io/Homecoming-RSVP/',
+  siteUrl: 'https://ongaria-homecoming.netlify.app/',
 };
