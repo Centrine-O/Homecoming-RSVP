@@ -5,7 +5,7 @@ export default {
   grandfather: 'Grado',
   grandmother: 'Teresa',
   date: 'December 2026 (exact date to be confirmed)',
-  venue: "Ong'aria's Homestead",
+  venue: "Ong'aria's Homestead (Indangalasia)",
   mapsUrl: '',                             // a Google Maps pin link; empty hides "Get directions"
   host: '',                                // shown as "Hosted by …"; empty hides the line
   saying: '',                              // the family saying in the band at the foot of the header; empty hides it
