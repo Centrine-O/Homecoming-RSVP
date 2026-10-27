@@ -1,0 +1,8 @@
+# Netlify: publish the static web/ folder as-is. The "build" only runs the tests,
+# so a commit that breaks the business rules never goes live.
+[build]
+  publish = "web"
+  command = "npm test"
+
+[build.environment]
+  NODE_VERSION = "22"
