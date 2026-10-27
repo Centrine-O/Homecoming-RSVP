@@ -261,10 +261,19 @@ function setClosed(message) {
 function renderTotals(t) {
   const box = $('totals');
   box.textContent = '';
+  if (t.coming + t.mightCome + t.declined === 0) {
+    box.append(el('p', { class: 'breakdown' }, 'No replies yet. Yours can be the first.'));
+    return;
+  }
   box.append(
-    el('strong', {}, plural(t.coming, 'person', 'people') + ' coming'),
-    ` (${plural(t.adults, 'adult', 'adults')}, ${plural(t.children, 'child', 'children')})`,
-    ` · ${t.mightCome} might come · ${t.declined} can't make it`,
+    el('p', { class: 'headcount' },
+      el('span', { class: 'big' }, String(t.coming)),
+      el('span', { class: 'what' }, `${t.coming === 1 ? 'person' : 'people'} coming so far`)),
+    el('p', { class: 'breakdown' }, [
+      t.coming > 0 ? `${plural(t.adults, 'adult', 'adults')} and ${plural(t.children, 'child', 'children')}.` : '',
+      t.mightCome > 0 ? `${t.mightCome} more might come.` : '',
+      t.declined > 0 ? `${plural(t.declined, 'reply says', 'replies say')} they can't make it.` : '',
+    ].filter(Boolean).join(' ')),
   );
 }
 
@@ -282,7 +291,7 @@ function renderLists(rows) {
     for (const r of groups[status]) {
       const size = partySize(r);
       ul.append(el('li', {},
-        el('span', { class: 'who' }, r.name),
+        el('span', { class: 'who-name' }, r.name),
         el('span', { class: 'meta' }, [r.branch, size].filter(Boolean).join(' · '))));
     }
   }

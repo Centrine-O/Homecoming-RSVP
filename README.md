@@ -21,7 +21,7 @@ While `apiUrl` in `web/config.js` is empty, the page runs in **preview mode**: a
 
 Event details are in `web/config.js`, filled in from the answers recorded in section 3 of the requirements. Still to come: the exact December date, the RSVP deadline and a Google Maps pin.
 
-The link preview text is in the `og:` tags in `web/index.html`, because WhatsApp reads them without running JavaScript. The preview card is `web/og-image.jpg` (1200×630), made from the family photo `web/homestead.jpg`.
+The link preview text is in the `og:` tags in `web/index.html`, because WhatsApp reads them without running JavaScript. The preview card is `web/og-image.jpg` (1200×630). The page photo is `web/homestead.webp` / `.jpg`, cropped and compressed from the original in `assets/homestead-original.jpg` (not published).
 
 ## 2. Create the backend (one time)
 

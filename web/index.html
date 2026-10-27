@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Karibu nyumbani · Grado &amp; Teresa homecoming</title>
   <meta name="description" content="The family is gathering at home. Tap to say if you're coming. It takes under a minute, no sign-up.">
-  <meta name="theme-color" content="#1E2A5A">
+  <meta name="theme-color" content="#F3F5EF">
+  <meta name="color-scheme" content="light">
 
   <!-- Link preview card (NFR-10). WhatsApp reads these without running JavaScript, so they live here,
        not in config.js. og:url and og:image must be absolute URLs. -->
@@ -19,174 +20,190 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
 
+  <link rel="preload" as="image" href="homestead.webp" type="image/webp" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Young+Serif&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Gloock&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="app.js"></script>
 </head>
 <body>
   <a class="skip" href="#reply">Skip to the reply form</a>
 
-  <p id="preview-banner" class="banner" hidden>
-    Preview mode: replies are saved on this device only. Add the Apps Script link as <code>apiUrl</code> in config.js to go live.
-  </p>
+  <div class="layout">
+    <header class="hero">
+      <picture>
+        <source srcset="homestead.webp" type="image/webp">
+        <img class="hero-photo" src="homestead.jpg" width="600" height="1067"
+             alt="The lawn, garden and tall trees at Ong'aria's Homestead" fetchpriority="high">
+      </picture>
+      <div class="hero-text">
+        <p class="karibu">Karibu nyumbani</p>
+        <p class="lead">A homecoming for the family of</p>
+        <h1 class="names">
+          <span class="name" data-cfg="grandfather"></span>
+          <span class="name"><span class="amp" aria-hidden="true">&amp;</span><span class="visually-hidden">and</span> <span data-cfg="grandmother"></span></span>
+        </h1>
+        <p class="jina" data-cfg="saying"></p>
+      </div>
+    </header>
 
-  <header class="kanga">
-    <div class="kanga-panel">
-      <p class="karibu">Karibu nyumbani</p>
-      <p class="lead">A homecoming for the family of</p>
-      <h1 class="names">
-        <span data-cfg="grandfather"></span>
-        <span class="amp" aria-hidden="true">&amp;</span><span class="visually-hidden">and</span>
-        <span data-cfg="grandmother"></span>
-      </h1>
+    <div class="content">
+      <p id="preview-banner" class="banner" hidden>
+        Preview mode: replies are saved on this device only. Add the Apps Script link as <code>apiUrl</code> in config.js to go live.
+      </p>
+
       <dl class="details">
-        <div><dt>When</dt><dd data-cfg="date"></dd></div>
+        <div>
+          <dt>When</dt>
+          <dd data-cfg="date"></dd>
+        </div>
         <div>
           <dt>Where</dt>
           <dd><span data-cfg="venue"></span> <a id="directions" class="directions" target="_blank" rel="noopener" hidden>Get directions</a></dd>
         </div>
-        <div id="host-row"><dt>Host</dt><dd>Hosted by <span data-cfg="host"></span></dd></div>
+        <div id="host-row">
+          <dt>Host</dt>
+          <dd data-cfg="host"></dd>
+        </div>
       </dl>
+
+      <main>
+        <section id="reply" class="reply" aria-labelledby="reply-title">
+          <h2 id="reply-title">Will you be there?</h2>
+          <p id="deadline-note" class="hint" hidden></p>
+
+          <p id="closed" class="closed" role="status" hidden></p>
+
+          <form id="form" novalidate>
+            <div class="field">
+              <label for="name">Your full name</label>
+              <input id="name" name="name" type="text" autocomplete="name" maxlength="80" required aria-describedby="name-error">
+              <p id="name-error" class="error" hidden></p>
+            </div>
+
+            <div id="branch-field" class="field">
+              <label for="branch">Your family branch</label>
+              <p id="branch-hint" class="hint">The grandparents' child whose family you belong to, by birth or marriage.</p>
+              <select id="branch" name="branch" required aria-describedby="branch-hint branch-error">
+                <option value="">Choose your branch</option>
+              </select>
+              <p id="branch-error" class="error" hidden></p>
+            </div>
+
+            <fieldset class="field" aria-describedby="status-error">
+              <legend>Are you coming?</legend>
+              <div class="choices">
+                <label class="choice is-attending">
+                  <input type="radio" name="status" value="attending">
+                  <span class="choice-face">Coming</span>
+                </label>
+                <label class="choice is-tentative">
+                  <input type="radio" name="status" value="tentative">
+                  <span class="choice-face">Not sure yet</span>
+                </label>
+                <label class="choice is-declined">
+                  <input type="radio" name="status" value="declined">
+                  <span class="choice-face">Can't make it</span>
+                </label>
+              </div>
+              <p id="status-error" class="error" hidden></p>
+            </fieldset>
+
+            <fieldset id="counts" class="field counts">
+              <legend>How many of you?</legend>
+              <p class="hint">Count everyone you are replying for, including yourself.</p>
+              <div class="steppers">
+                <div class="stepper">
+                  <label for="adults">Adults</label>
+                  <div class="stepper-row">
+                    <button type="button" class="step" data-target="adults" data-step="-1" aria-label="One adult fewer">−</button>
+                    <input id="adults" name="adults" type="number" inputmode="numeric" min="1" max="30" value="1">
+                    <button type="button" class="step" data-target="adults" data-step="1" aria-label="One adult more">+</button>
+                  </div>
+                </div>
+                <div class="stepper">
+                  <label for="children">Children</label>
+                  <div class="stepper-row">
+                    <button type="button" class="step" data-target="children" data-step="-1" aria-label="One child fewer">−</button>
+                    <input id="children" name="children" type="number" inputmode="numeric" min="0" max="30" value="0">
+                    <button type="button" class="step" data-target="children" data-step="1" aria-label="One child more">+</button>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="field">
+              <label for="message"><span id="message-label">A message to the family</span> <span class="optional">(optional)</span></label>
+              <textarea id="message" name="message" rows="3" maxlength="500" aria-describedby="message-count"></textarea>
+              <p id="message-count" class="hint count-hint">0 / 500</p>
+            </div>
+
+            <!-- Honeypot (BR-01.7): hidden from people, filled in by bots. -->
+            <div class="hp" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <p id="form-error" class="form-error" role="alert" hidden></p>
+            <button id="send" type="submit" class="btn btn-primary">Send my reply</button>
+          </form>
+
+          <div id="confirmation" class="confirmation" tabindex="-1" hidden>
+            <h3 id="confirm-title"></h3>
+            <p id="confirm-list"></p>
+            <div class="actions">
+              <a id="share" class="btn btn-share" target="_blank" rel="noopener">Share on WhatsApp</a>
+              <button id="change" type="button" class="link-btn">Change my reply</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="who" class="who" aria-labelledby="who-title">
+          <h2 id="who-title">Who has replied</h2>
+          <div id="totals" class="totals" aria-live="polite">Loading replies…</div>
+          <p id="load-error" class="notice" role="status" hidden>Couldn't refresh the list. Check your connection; it will try again shortly.</p>
+          <p id="private-note" class="hint" hidden>Only the hosts can see who has replied.</p>
+          <div id="lists" class="lists">
+            <div class="list is-attending" data-status="attending">
+              <h3>Coming <span class="count"></span></h3>
+              <ul></ul>
+            </div>
+            <div class="list is-tentative" data-status="tentative">
+              <h3>Not sure yet <span class="count"></span></h3>
+              <ul></ul>
+            </div>
+            <div class="list is-declined" data-status="declined">
+              <h3>Can't make it <span class="count"></span></h3>
+              <ul></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="branches" aria-labelledby="branches-title">
+          <h2 id="branches-title">Replies by family branch</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th scope="col">Branch</th><th scope="col" class="num">Replies</th><th scope="col" class="num">People coming</th></tr>
+              </thead>
+              <tbody id="branch-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="messages" aria-labelledby="messages-title" hidden>
+          <h2 id="messages-title">Messages to the family</h2>
+          <div id="message-list" class="message-list"></div>
+        </section>
+      </main>
+
+      <footer>
+        <p id="contact" class="contact"></p>
+        <p><a id="share-footer" target="_blank" rel="noopener">Share this page on WhatsApp</a></p>
+        <p id="refreshed" class="refreshed"></p>
+      </footer>
     </div>
-    <p class="jina" data-cfg="saying"></p>
-  </header>
-
-  <main>
-    <section id="reply" class="card" aria-labelledby="reply-title">
-      <h2 id="reply-title">Will you be there?</h2>
-      <p id="deadline-note" class="hint" hidden></p>
-
-      <p id="closed" class="closed" role="status" hidden></p>
-
-      <form id="form" novalidate>
-        <div class="field">
-          <label for="name">Your full name</label>
-          <input id="name" name="name" type="text" autocomplete="name" maxlength="80" required aria-describedby="name-error">
-          <p id="name-error" class="error" hidden></p>
-        </div>
-
-        <div id="branch-field" class="field">
-          <label for="branch">Your family branch</label>
-          <p id="branch-hint" class="hint">The grandparents' child whose family you belong to, by birth or marriage.</p>
-          <select id="branch" name="branch" required aria-describedby="branch-hint branch-error">
-            <option value="">Choose your branch</option>
-          </select>
-          <p id="branch-error" class="error" hidden></p>
-        </div>
-
-        <fieldset class="field" aria-describedby="status-error">
-          <legend>Are you coming?</legend>
-          <div class="status-cards">
-            <label class="status-card is-attending">
-              <input type="radio" name="status" value="attending">
-              <span class="status-face"><span class="status-mark" aria-hidden="true">✓</span>Coming</span>
-            </label>
-            <label class="status-card is-tentative">
-              <input type="radio" name="status" value="tentative">
-              <span class="status-face"><span class="status-mark" aria-hidden="true">?</span>Not sure yet</span>
-            </label>
-            <label class="status-card is-declined">
-              <input type="radio" name="status" value="declined">
-              <span class="status-face"><span class="status-mark" aria-hidden="true">✕</span>Can't make it</span>
-            </label>
-          </div>
-          <p id="status-error" class="error" hidden></p>
-        </fieldset>
-
-        <fieldset id="counts" class="field counts">
-          <legend>How many of you?</legend>
-          <p class="hint">Count everyone you are replying for, including yourself.</p>
-          <div class="steppers">
-            <div class="stepper">
-              <label for="adults">Adults</label>
-              <div class="stepper-row">
-                <button type="button" class="step" data-target="adults" data-step="-1" aria-label="One adult fewer">−</button>
-                <input id="adults" name="adults" type="number" inputmode="numeric" min="1" max="30" value="1">
-                <button type="button" class="step" data-target="adults" data-step="1" aria-label="One adult more">+</button>
-              </div>
-            </div>
-            <div class="stepper">
-              <label for="children">Children</label>
-              <div class="stepper-row">
-                <button type="button" class="step" data-target="children" data-step="-1" aria-label="One child fewer">−</button>
-                <input id="children" name="children" type="number" inputmode="numeric" min="0" max="30" value="0">
-                <button type="button" class="step" data-target="children" data-step="1" aria-label="One child more">+</button>
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <div class="field">
-          <label for="message"><span id="message-label">A message to the family</span> <span class="optional">(optional)</span></label>
-          <textarea id="message" name="message" rows="3" maxlength="500" aria-describedby="message-count"></textarea>
-          <p id="message-count" class="hint count-hint">0 / 500</p>
-        </div>
-
-        <!-- Honeypot (BR-01.7): hidden from people, filled in by bots. -->
-        <div class="hp" aria-hidden="true">
-          <label for="website">Website</label>
-          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-        </div>
-
-        <p id="form-error" class="form-error" role="alert" hidden></p>
-        <button id="send" type="submit" class="btn btn-primary">Send my reply</button>
-      </form>
-
-      <div id="confirmation" class="confirmation" tabindex="-1" hidden>
-        <h3 id="confirm-title"></h3>
-        <p id="confirm-list"></p>
-        <div class="actions">
-          <a id="share" class="btn btn-share" target="_blank" rel="noopener">Share on WhatsApp</a>
-          <button id="change" type="button" class="link-btn">Change my reply</button>
-        </div>
-      </div>
-    </section>
-
-    <section id="who" aria-labelledby="who-title">
-      <h2 id="who-title">Who has replied</h2>
-      <p id="totals" class="totals" aria-live="polite">Loading replies…</p>
-      <p id="load-error" class="notice" role="status" hidden>Couldn't refresh the list. Check your connection; it will try again shortly.</p>
-      <p id="private-note" class="hint" hidden>Only the hosts can see who has replied.</p>
-      <div id="lists" class="lists">
-        <div class="list is-attending" data-status="attending">
-          <h3>Coming <span class="count"></span></h3>
-          <ul></ul>
-        </div>
-        <div class="list is-tentative" data-status="tentative">
-          <h3>Not sure yet <span class="count"></span></h3>
-          <ul></ul>
-        </div>
-        <div class="list is-declined" data-status="declined">
-          <h3>Can't make it <span class="count"></span></h3>
-          <ul></ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="branches" aria-labelledby="branches-title">
-      <h2 id="branches-title">Replies by family branch</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th scope="col">Branch</th><th scope="col" class="num">Replies</th><th scope="col" class="num">People coming</th></tr>
-          </thead>
-          <tbody id="branch-rows"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section id="messages" aria-labelledby="messages-title" hidden>
-      <h2 id="messages-title">Messages to the family</h2>
-      <div id="message-list" class="message-list"></div>
-    </section>
-  </main>
-
-  <footer>
-    <p id="refreshed"></p>
-    <p id="contact"></p>
-    <p><a id="share-footer" target="_blank" rel="noopener">Share this page on WhatsApp</a></p>
-  </footer>
+  </div>
 </body>
 </html>
