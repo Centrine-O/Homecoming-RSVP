@@ -1,0 +1,11 @@
+{
+  "name": "homecoming-rsvp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "No-login family homecoming RSVP: static page + Google Apps Script + Google Sheet",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/",
+    "serve": "python3 -m http.server 8080 --directory web"
+  }
+}
