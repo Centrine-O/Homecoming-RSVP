@@ -64,7 +64,11 @@ function fillEventDetails() {
   document.querySelector('.jina').hidden = !CONFIG.saying;
   $('branch-field').hidden = !usesBranches(RULES);
   $('branches').hidden = !usesBranches(RULES);
-  if (!CONFIG.showPublicLists) $('who-title').textContent = 'Replies so far';
+  if (!CONFIG.showPublicLists) {
+    // Hosts only: no names and no numbers on the page, just the note saying so.
+    for (const id of ['who-title', 'totals', 'lists', 'refreshed']) $(id).hidden = true;
+    $('private-note').hidden = false;
+  }
   if (!CONFIG.showPublicMessages || !CONFIG.showPublicLists) {
     $('message-label').textContent = 'A message for the hosts';
   }
@@ -330,8 +334,7 @@ function render(data) {
     $('lists').hidden = false;
     $('private-note').hidden = true;
   } else {
-    // BR-10: the server sent counts only.
-    renderTotals(data.totals);
+    // BR-10: the server sent counts only. The page shows none of them, only that replies are private.
     renderCoverage(data.coverage);
     $('lists').hidden = true;
     $('messages').hidden = true;
@@ -352,7 +355,7 @@ async function refresh() {
     $('refreshed').textContent = 'List updated at '
       + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '.';
   } catch {
-    $('load-error').hidden = false;
+    $('load-error').hidden = !CONFIG.showPublicLists; // nothing to refresh when replies are private
     if (!lastLoadAt) $('totals').textContent = '';
   } finally {
     loading = false;
