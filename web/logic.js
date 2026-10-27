@@ -133,3 +133,16 @@ export function isClosed(deadline, now = new Date()) {
 export function closedMessage(dateText, contact) {
   return `Replies closed on ${dateText}. Call ${contact} to make a change.`;
 }
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+  'September', 'October', 'November', 'December'];
+
+// 'YYYY-MM-DD' → '1 December 2026' (same wording as the server's closed message).
+export function formatIsoDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+  return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${m[1]}` : String(iso || '');
+}
+
+export function contactText({ name = '', phone = '' } = {}) {
+  return phone ? `${name} on ${phone}` : name || 'the hosts';
+}

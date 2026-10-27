@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   validateReply, computeTotals, branchCoverage, sortForList,
   cleanName, makeKey, partySize, messagesForWall, isClosed, closedMessage,
-  escapeFormula, STATUS_LABELS,
+  escapeFormula, STATUS_LABELS, formatIsoDate, contactText,
 } from '../web/logic.js';
 
 const BRANCHES = ['Family of Ann', 'Family of Ben', 'Family of Cate'];
@@ -208,6 +208,13 @@ describe('BR-05 isClosed', () => {
   test('no deadline or a malformed one never closes', () => {
     assert.equal(isClosed('', new Date('2099-01-01')), false);
     assert.equal(isClosed('soon', new Date('2099-01-01')), false);
+  });
+  test('formatIsoDate and contactText', () => {
+    assert.equal(formatIsoDate('2026-12-01'), '1 December 2026');
+    assert.equal(formatIsoDate('next week'), 'next week');
+    assert.equal(contactText({ name: 'Peter', phone: '0700 000 000' }), 'Peter on 0700 000 000');
+    assert.equal(contactText({ name: 'Peter' }), 'Peter');
+    assert.equal(contactText(), 'the hosts');
   });
   test('closedMessage', () => {
     assert.equal(closedMessage('1 December 2026', 'Peter on 0700 000 000'),
