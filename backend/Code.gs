@@ -2,7 +2,8 @@
  * Family Homecoming RSVP — Apps Script web app (docs/REQUIREMENTS.md section 8).
  *
  * Server config lives in Script Properties (Project Settings → Script properties):
- *   BRANCHES             JSON array, same order as config.js, e.g. ["Family of Ann","Family of Ben"]
+ *   BRANCHES             JSON array, same order as config.js, e.g. ["Family of Ann","Family of Ben"];
+ *                        [] with OTHER_BRANCH empty switches the branch question off
  *   OTHER_BRANCH         same text as otherBranchLabel in config.js
  *   RSVP_DEADLINE        YYYY-MM-DD (end of that day, Nairobi time); empty = never closes
  *   SHOW_PUBLIC_LISTS    "true" or "false"
@@ -120,8 +121,10 @@ function validateReply_(data, cfg) {
   if (name.length < LIMITS.nameMin || name.length > LIMITS.nameMax) {
     return { ok: false, field: 'name', error: 'Add your full name.' };
   }
-  var branch = String(data.branch == null ? '' : data.branch);
-  if (branch === '' || (cfg.branches.indexOf(branch) === -1 && branch !== cfg.otherBranch)) {
+  // With no branches configured the question is switched off and every reply has branch ''.
+  var usesBranches = cfg.branches.length > 0 || Boolean(cfg.otherBranch);
+  var branch = usesBranches ? String(data.branch == null ? '' : data.branch) : '';
+  if (usesBranches && (branch === '' || (cfg.branches.indexOf(branch) === -1 && branch !== cfg.otherBranch))) {
     return { ok: false, field: 'branch', error: 'Choose your family branch.' };
   }
   var status = String(data.status == null ? '' : data.status);
@@ -303,12 +306,12 @@ function setup() {
   // Seed Script Properties that are not set yet, so the app runs straight away.
   var props = PropertiesService.getScriptProperties();
   var defaults = {
-    BRANCHES: '["Family of [first child]","Family of [second child]","Family of [third child]"]',
-    OTHER_BRANCH: 'Other / friend of the family',
+    BRANCHES: '[]',
+    OTHER_BRANCH: '',
     RSVP_DEADLINE: '',
-    SHOW_PUBLIC_LISTS: 'true',
-    SHOW_PUBLIC_MESSAGES: 'true',
-    CONTACT: 'the hosts'
+    SHOW_PUBLIC_LISTS: 'false',
+    SHOW_PUBLIC_MESSAGES: 'false',
+    CONTACT: 'Uncle Gilly on 0725 433 625'
   };
   Object.keys(defaults).forEach(function (k) {
     if (props.getProperty(k) === null) props.setProperty(k, defaults[k]);

@@ -19,7 +19,7 @@ While `apiUrl` in `web/config.js` is empty, the page runs in **preview mode**: a
 
 ## 1. Fill in the event details
 
-Edit `web/config.js`. Everything in `[square brackets]` is waiting for an answer from section 3 of the requirements: names, date, venue, Maps pin, branches in birth order, deadline, privacy switches and contact.
+Event details are in `web/config.js`, filled in from the answers recorded in section 3 of the requirements. Still to come: the exact December date, the RSVP deadline and a Google Maps pin.
 
 The link preview text is in the `og:` tags in `web/index.html`, because WhatsApp reads them without running JavaScript. Replace `web/og-image.png` with a 1200×630 photo of the grandparents if you have one. The current image is a placeholder.
 
@@ -39,14 +39,16 @@ clasp push
 2. Choose `setup` in the function dropdown, click **Run**, and approve the permissions. This creates the `RSVPs` and `Summary` tabs and placeholder Script Properties.
 3. Go to Project Settings → **Script properties** and set them to match `config.js`:
 
-   | Property | Example |
-   | --- | --- |
-   | `BRANCHES` | `["Family of Ann","Family of Ben"]` (same text and order as `branches`) |
-   | `OTHER_BRANCH` | `Other / friend of the family` (same as `otherBranchLabel`) |
-   | `RSVP_DEADLINE` | `2026-12-01`, or empty for no deadline |
-   | `SHOW_PUBLIC_LISTS` | `true` or `false` |
-   | `SHOW_PUBLIC_MESSAGES` | `true` or `false` |
-   | `CONTACT` | `Peter on 0700 000 000` |
+   `setup()` already seeds them with the current answers, so you only need to change `RSVP_DEADLINE` once the date is set.
+
+   | Property | Current value | Meaning |
+   | --- | --- | --- |
+   | `BRANCHES` | `[]` | No family branches; the branch question is off |
+   | `OTHER_BRANCH` | (empty) | Same as `otherBranchLabel` |
+   | `RSVP_DEADLINE` | (empty) | e.g. `2026-12-10`; empty means the form never closes |
+   | `SHOW_PUBLIC_LISTS` | `false` | Only the hosts see names, in the sheet |
+   | `SHOW_PUBLIC_MESSAGES` | `false` | Messages go to the hosts only |
+   | `CONTACT` | `Uncle Gilly on 0725 433 625` | Used in the "Replies closed" message |
 
 4. Deploy → **New deployment** → type **Web app**, with Execute as: **Me** and Who has access: **Anyone**. Copy the `/exec` URL into `apiUrl` in `web/config.js`.
 

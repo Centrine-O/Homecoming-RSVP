@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   validateReply, computeTotals, branchCoverage, sortForList,
   cleanName, makeKey, partySize, messagesForWall, isClosed, closedMessage,
-  escapeFormula, STATUS_LABELS, formatIsoDate, contactText,
+  escapeFormula, STATUS_LABELS, formatIsoDate, contactText, usesBranches,
 } from '../web/logic.js';
 
 const BRANCHES = ['Family of Ann', 'Family of Ben', 'Family of Cate'];
@@ -47,6 +47,13 @@ describe('BR-01 validateReply: branch and status', () => {
   });
   test('rejects an empty Other option when none is configured', () => {
     assert.equal(validateReply({ ...base, branch: '' }, { branches: BRANCHES, otherBranch: '' }).ok, false);
+  });
+  test('with no branches configured, the branch question is off and stored as empty', () => {
+    const off = { branches: [], otherBranch: '' };
+    assert.equal(usesBranches(off), false);
+    assert.equal(validateReply({ ...base, branch: '' }, off).reply.branch, '');
+    assert.equal(validateReply({ ...base, branch: 'Anything' }, off).reply.branch, '');
+    assert.equal(usesBranches({ branches: [], otherBranch: 'Other' }), true);
   });
   test('rejects unknown status', () => {
     for (const status of ['', undefined, 'yes', 'Attending']) {

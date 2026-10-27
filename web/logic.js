@@ -18,6 +18,10 @@ export function makeKey(name, branch) {
   return cleanName(name).toLowerCase() + '|' + branch;
 }
 
+export function usesBranches({ branches, otherBranch }) {
+  return branches.length > 0 || Boolean(otherBranch);
+}
+
 function toCount(value, fallback, min, max) {
   if (value === '' || value == null) return fallback;
   const n = Math.round(Number(value));
@@ -35,8 +39,10 @@ export function validateReply(input, { branches, otherBranch }) {
     return { ok: false, field: 'name', error: ERRORS.name };
   }
 
-  const branch = String(data.branch ?? '');
-  const validBranch = branch !== '' && (branches.includes(branch) || branch === otherBranch);
+  // With no branches configured the question is switched off and every reply has branch ''.
+  const branch = usesBranches({ branches, otherBranch }) ? String(data.branch ?? '') : '';
+  const validBranch = !usesBranches({ branches, otherBranch })
+    || (branch !== '' && (branches.includes(branch) || branch === otherBranch));
   if (!validBranch) return { ok: false, field: 'branch', error: ERRORS.branch };
 
   const status = String(data.status ?? '');

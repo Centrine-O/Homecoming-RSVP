@@ -3,7 +3,7 @@ import CONFIG from './config.js';
 import * as api from './api.js';
 import {
   STATUSES, STATUS_LABELS, LIMITS, validateReply, computeTotals, branchCoverage, sortForList,
-  partySize, messagesForWall, isClosed, closedMessage, formatIsoDate, contactText,
+  partySize, messagesForWall, isClosed, closedMessage, formatIsoDate, contactText, usesBranches,
 } from './logic.js';
 
 const REFRESH_MS = 60000;
@@ -49,7 +49,8 @@ const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const pageUrl = () => CONFIG.siteUrl || location.origin + location.pathname;
 
 function shareHref() {
-  const text = `Karibu nyumbani! The family of ${CONFIG.grandfather} & ${CONFIG.grandmother} is gathering at home on ${CONFIG.date}.\n`
+  const where = CONFIG.venue ? ` at ${CONFIG.venue}` : ' at home';
+  const text = `Karibu nyumbani! The family of ${CONFIG.grandfather} & ${CONFIG.grandmother} is gathering${where}: ${CONFIG.date}.\n`
     + `Tap to say if you're coming: ${pageUrl()}\n`
     + 'Please forward to everyone in your household.';
   return 'https://wa.me/?text=' + encodeURIComponent(text);
@@ -59,6 +60,14 @@ function shareHref() {
 
 function fillEventDetails() {
   for (const node of document.querySelectorAll('[data-cfg]')) node.textContent = CONFIG[node.dataset.cfg] ?? '';
+  $('host-row').hidden = !CONFIG.host;
+  document.querySelector('.jina').hidden = !CONFIG.saying;
+  $('branch-field').hidden = !usesBranches(RULES);
+  $('branches').hidden = !usesBranches(RULES);
+  if (!CONFIG.showPublicLists) $('who-title').textContent = 'Replies so far';
+  if (!CONFIG.showPublicMessages || !CONFIG.showPublicLists) {
+    $('message-label').textContent = 'A message for the hosts';
+  }
   if (CONFIG.mapsUrl) {
     $('directions').href = CONFIG.mapsUrl;
     $('directions').hidden = false;
@@ -274,7 +283,7 @@ function renderLists(rows) {
       const size = partySize(r);
       ul.append(el('li', {},
         el('span', { class: 'who' }, r.name),
-        el('span', { class: 'meta' }, size ? `${r.branch} · ${size}` : r.branch)));
+        el('span', { class: 'meta' }, [r.branch, size].filter(Boolean).join(' · '))));
     }
   }
 }
@@ -298,7 +307,7 @@ function renderMessages(rows) {
   for (const r of messages) {
     list.append(el('figure', { class: 'quote' },
       el('blockquote', {}, r.message),
-      el('figcaption', {}, `${r.name}, ${r.branch}`)));
+      el('figcaption', {}, [r.name, r.branch].filter(Boolean).join(', '))));
   }
   $('messages').hidden = messages.length === 0;
 }

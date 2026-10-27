@@ -141,6 +141,15 @@ describe('POST validation (BR-01)', () => {
     assert.equal(sheet.data.length, 1);
   });
 
+  test('with no branches configured, replies save with an empty branch and upsert by name', () => {
+    load({ BRANCHES: '[]', OTHER_BRANCH: '' });
+    assert.deepEqual(post(reply({ branch: '' })), { ok: true, updated: false });
+    assert.deepEqual(post(reply({ branch: 'ignored', status: 'tentative' })), { ok: true, updated: true });
+    assert.equal(sheet.data.length, 2);
+    assert.equal(sheet.data[1][2], '');
+    assert.equal(sheet.data[1][7], 'wanjiru k.|');
+  });
+
   test('a body that is not JSON is a validation error, not a crash', () => {
     assert.equal(JSON.parse(ctx.doPost({ postData: { contents: 'nope' } }).body).code, 'validation');
     assert.equal(JSON.parse(ctx.doPost(undefined).body).code, 'validation');

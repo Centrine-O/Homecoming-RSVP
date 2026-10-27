@@ -42,20 +42,20 @@ Confirm these with Dad before writing code. Every item becomes a value in the ap
 
 | # | Question | Why it matters | Answer |
 | --- | --- | --- | --- |
-| Q1 | Grandfather's full name as the family uses it | Hero title on the page |  |
-| Q2 | Grandmother's full name as the family uses it | Hero title on the page |  |
-| Q3 | Names of each of the grandparents' children, in birth order | Each child becomes one family branch in the dropdown and in the coverage table |  |
-| Q4 | Event date or dates, and arrival and departure times | Shown on the page; decides whether overnight stay counts are needed |  |
-| Q5 | Venue: home name or village, plus a Google Maps pin | Shown on the page, with a directions link |  |
-| Q6 | RSVP deadline | Locks the form after this date |  |
-| Q7 | Should replies be visible to everyone, or only to the hosts? | Decides whether the public lists are shown |  |
-| Q8 | Are messages to the family public or private? | Privacy of the message wall |  |
-| Q9 | Do we need overnight accommodation counts? | Optional "staying overnight" field |  |
-| Q10 | Do we need dietary needs or contributions, such as who brings what? | Optional extra fields; out of scope unless confirmed |  |
-| Q11 | Language: English only, or English and Kiswahili? | Copy and labels |  |
-| Q12 | Who else needs edit access to the sheet? | Google Sheet sharing |  |
-| Q13 | Is there a photo of the grandparents for the WhatsApp preview? | `og:image` link preview |  |
-| Q14 | Contact person and phone number for questions | Footer of the page |  |
+| Q1 | Grandfather's full name as the family uses it | Hero title on the page | Grado |
+| Q2 | Grandmother's full name as the family uses it | Hero title on the page | Teresa |
+| Q3 | Names of each of the grandparents' children, in birth order | Each child becomes one family branch in the dropdown and in the coverage table | Not needed: the branch question and branch table are switched off |
+| Q4 | Event date or dates, and arrival and departure times | Shown on the page; decides whether overnight stay counts are needed | December 2026, exact date to be confirmed |
+| Q5 | Venue: home name or village, plus a Google Maps pin | Shown on the page, with a directions link | Ong'aria's Homestead; no Maps pin yet |
+| Q6 | RSVP deadline | Locks the form after this date | None yet (form stays open) |
+| Q7 | Should replies be visible to everyone, or only to the hosts? | Decides whether the public lists are shown | Hosts only: the page shows counts, never names |
+| Q8 | Are messages to the family public or private? | Privacy of the message wall | Private (follows Q7) |
+| Q9 | Do we need overnight accommodation counts? | Optional "staying overnight" field | No |
+| Q10 | Do we need dietary needs or contributions, such as who brings what? | Optional extra fields; out of scope unless confirmed | No |
+| Q11 | Language: English only, or English and Kiswahili? | Copy and labels | English only |
+| Q12 | Who else needs edit access to the sheet? | Google Sheet sharing | Centrine will share as needed |
+| Q13 | Is there a photo of the grandparents for the WhatsApp preview? | `og:image` link preview | Family homestead photo (to be added); kanga placeholder until then |
+| Q14 | Contact person and phone number for questions | Footer of the page | Uncle Gilly, 0725 433 625 |
 
 ## 4. Functional requirements
 

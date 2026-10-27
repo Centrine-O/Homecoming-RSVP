@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Karibu nyumbani · Family homecoming</title>
+  <title>Karibu nyumbani · Grado &amp; Teresa homecoming</title>
   <meta name="description" content="The family is gathering at home. Tap to say if you're coming. It takes under a minute, no sign-up.">
   <meta name="theme-color" content="#1E2A5A">
 
@@ -11,8 +11,8 @@
        not in config.js. og:url and og:image must be absolute URLs. -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Karibu nyumbani">
-  <meta property="og:title" content="Karibu nyumbani: the family is gathering at home">
-  <meta property="og:description" content="Tap to say if you're coming. It takes under a minute, no sign-up.">
+  <meta property="og:title" content="Karibu nyumbani: the family of Grado &amp; Teresa is gathering at home">
+  <meta property="og:description" content="December 2026 at Ong'aria's Homestead. Tap to say if you're coming. It takes under a minute, no sign-up.">
   <meta property="og:url" content="https://centrine-o.github.io/Homecoming-RSVP/">
   <meta property="og:image" content="https://centrine-o.github.io/Homecoming-RSVP/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -47,7 +47,7 @@
           <dt>Where</dt>
           <dd><span data-cfg="venue"></span> <a id="directions" class="directions" target="_blank" rel="noopener" hidden>Get directions</a></dd>
         </div>
-        <div><dt>Host</dt><dd>Hosted by <span data-cfg="host"></span></dd></div>
+        <div id="host-row"><dt>Host</dt><dd>Hosted by <span data-cfg="host"></span></dd></div>
       </dl>
     </div>
     <p class="jina" data-cfg="saying"></p>
@@ -67,7 +67,7 @@
           <p id="name-error" class="error" hidden></p>
         </div>
 
-        <div class="field">
+        <div id="branch-field" class="field">
           <label for="branch">Your family branch</label>
           <p id="branch-hint" class="hint">The grandparents' child whose family you belong to, by birth or marriage.</p>
           <select id="branch" name="branch" required aria-describedby="branch-hint branch-error">
@@ -119,7 +119,7 @@
         </fieldset>
 
         <div class="field">
-          <label for="message">A message to the family <span class="optional">(optional)</span></label>
+          <label for="message"><span id="message-label">A message to the family</span> <span class="optional">(optional)</span></label>
           <textarea id="message" name="message" rows="3" maxlength="500" aria-describedby="message-count"></textarea>
           <p id="message-count" class="hint count-hint">0 / 500</p>
         </div>
@@ -148,7 +148,7 @@
       <h2 id="who-title">Who has replied</h2>
       <p id="totals" class="totals" aria-live="polite">Loading replies…</p>
       <p id="load-error" class="notice" role="status" hidden>Couldn't refresh the list. Check your connection; it will try again shortly.</p>
-      <p id="private-note" class="hint" hidden>Names are visible to the hosts only.</p>
+      <p id="private-note" class="hint" hidden>Only the hosts can see who has replied.</p>
       <div id="lists" class="lists">
         <div class="list is-attending" data-status="attending">
           <h3>Coming <span class="count"></span></h3>
