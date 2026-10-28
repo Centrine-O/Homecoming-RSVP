@@ -239,7 +239,7 @@ describe('GET (section 8, BR-09, BR-10)', () => {
     post(reply({ name: 'Akinyi', status: 'tentative' }));
     post(reply({ name: 'amani' }));
     const g = get();
-    assert.deepEqual(g.coming, ['amani', "Zawadi Ong'aria"]);
+    assert.deepEqual(g.coming, [{ name: 'amani', plus: 4 }, { name: "Zawadi Ong'aria", plus: 4 }]);
     assert.equal(g.rows, undefined);
     assert.ok(!JSON.stringify(g).includes('Baraka') && !JSON.stringify(g).includes('Akinyi'));
   });

@@ -8,8 +8,8 @@
  *   RSVP_DEADLINE        YYYY-MM-DD (end of that day, Nairobi time); empty = never closes
  *   SHOW_PUBLIC_LISTS    "true" or "false"
  *   SHOW_PUBLIC_MESSAGES "true" or "false"
- *   SHOW_COMING_NAMES    "true" = when lists are private, still send the names of people coming
- *                        (names only, A–Z) for the "Who's coming" panel; anything else = no names
+ *   SHOW_COMING_NAMES    "true" = when lists are private, still send the people coming
+ *                        (name and "+N" others, A–Z) for the "Who's coming" panel; anything else = no names
  *   CONTACT              e.g. "Peter on 0700 000 000" (used in the closed message)
  *   DATE_OPTIONS         optional JSON array of YYYY-MM-DD days people can pick when coming;
  *                        unset = DEFAULT_DATE_OPTIONS below. Keep in step with dateOptions in config.js.
@@ -214,20 +214,21 @@ function computeTotals_(rows) {
   return t;
 }
 
-// Names of people coming, A–Z, each once (mirrors comingNames in web/logic.js)
+// People coming, A–Z, each once: name and how many others they replied for
+// (mirrors comingNames in web/logic.js)
 function comingNames_(rows) {
   var seen = {};
-  var names = [];
+  var people = [];
   rows.forEach(function (r) {
     if (r.status !== 'attending') return;
     var name = cleanName_(r.name);
     var k = name.toLowerCase();
     if (name && !seen[k]) {
       seen[k] = true;
-      names.push(name);
+      people.push({ name: name, plus: Math.max(0, r.adults + r.children - 1) });
     }
   });
-  return names.sort(function (a, b) { return a.localeCompare(b, undefined, { sensitivity: 'base' }); });
+  return people.sort(function (a, b) { return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }); });
 }
 
 // BR-07

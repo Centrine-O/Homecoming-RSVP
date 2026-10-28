@@ -233,7 +233,12 @@ describe('comingNames and initials', () => {
       { name: '  zawadi  ', status: 'attending' },
       { name: 'Wanjiru   Kamau', status: 'attending' },
     ];
-    assert.deepEqual(comingNames(rows), ['Ali', 'Amani', 'Chebet', 'Mwangi', 'Otieno', 'Wanjiru Kamau', 'Zawadi']);
+    assert.deepEqual(comingNames(rows).map((p) => p.name), ['Ali', 'Amani', 'Chebet', 'Mwangi', 'Otieno', 'Wanjiru Kamau', 'Zawadi']);
+  });
+  test('plus is everyone else in their reply', () => {
+    const plus = Object.fromEntries(comingNames(FIXTURE).map((p) => [p.name, p.plus]));
+    // Zawadi 2+1, Amani 1+0, Chebet 3+4, Otieno 1+0, Mwangi 2+0, Ali 1+2
+    assert.deepEqual(plus, { Zawadi: 2, Amani: 0, Chebet: 6, Otieno: 0, Mwangi: 1, Ali: 2 });
   });
   test('empty when nobody is coming', () => {
     assert.deepEqual(comingNames(FIXTURE.filter((r) => r.status !== 'attending')), []);

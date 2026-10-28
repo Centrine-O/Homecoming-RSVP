@@ -287,12 +287,19 @@ function renderComing() {
     list.append(el('li', { class: 'faces-empty' }, "No one has said they're coming yet."));
     return;
   }
-  for (const name of coming) {
+  for (const person of coming) {
+    // Older servers send plain names; newer ones send { name, plus }.
+    const name = String(typeof person === 'string' ? person : person?.name ?? '');
+    const plus = Number(person?.plus) || 0;
+    if (!name) continue;
     const tone = [...name].reduce((sum, ch) => sum + ch.codePointAt(0), 0) % FACE_TONES;
     const isMe = name.toLowerCase() === me;
     list.append(el('li', { class: isMe ? 'face is-me' : 'face' },
       el('span', { class: `initials tone-${tone}`, 'aria-hidden': 'true' }, initials(name)),
       el('span', { class: 'face-name' }, name),
+      plus > 0 ? el('span', { class: 'plus', title: plural(plus, 'other person', 'other people') },
+        el('span', { 'aria-hidden': 'true' }, `+${plus}`),
+        el('span', { class: 'visually-hidden' }, ` and ${plural(plus, 'other', 'others')}`)) : null,
       isMe ? el('span', { class: 'you' }, 'You') : null));
   }
 }

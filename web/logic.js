@@ -136,20 +136,21 @@ export function partySize({ status, adults, children }) {
   return parts.join(', ');
 }
 
-// Names of people who said Coming, A–Z, each once. Nothing else about them is shared.
+// People who said Coming, A–Z, each once: their name and how many others they replied for
+// ('Centrine +1'). Nothing else about them is shared.
 export function comingNames(rows) {
   const seen = new Set();
-  const names = [];
+  const people = [];
   for (const r of rows) {
     if (r.status !== 'attending') continue;
     const name = cleanName(r.name);
     const k = name.toLowerCase();
     if (name && !seen.has(k)) {
       seen.add(k);
-      names.push(name);
+      people.push({ name, plus: Math.max(0, num(r.adults) + num(r.children) - 1) });
     }
   }
-  return names.sort(byText);
+  return people.sort((a, b) => byText(a.name, b.name));
 }
 
 // 'Wanjiru Kamau' → 'WK'; 'Otieno' → 'O'

@@ -438,3 +438,12 @@ footer a { font-weight: 700; display: inline-block; min-height: 44px; line-heigh
 .faces-empty { color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+.plus {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--lawn-deep);
+  background: var(--lawn-tint);
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.face.is-me .plus { background: var(--paper); }
