@@ -251,9 +251,19 @@ function showConfirmation(reply, returning) {
     list.append(' Days that work for you: ', el('strong', {}, reply.dates.map(dateLabel).join(', ')), '.');
   }
 
+  // People who said Coming before the days question existed: point them to it.
+  $('days-nudge').hidden = closed || reply.status !== 'attending'
+    || (reply.dates?.length ?? 0) > 0 || RULES.dateOptions.length === 0;
+
   form.hidden = true;
   $('confirmation').hidden = false;
   if (!returning) $('confirmation').focus();
+}
+
+function pickDays() {
+  changeReply();
+  $('dates-field').scrollIntoView({ block: 'start' });
+  form.querySelector('input[name="dates"]')?.focus({ preventScroll: true });
 }
 
 function changeReply() {
@@ -398,6 +408,7 @@ function init() {
   form.elements.message.addEventListener('input', syncMessageCount);
   for (const b of form.querySelectorAll('.step')) b.addEventListener('click', () => stepCount(b));
   $('change').addEventListener('click', changeReply);
+  $('pick-days').addEventListener('click', pickDays);
 
   if (isClosed(CONFIG.rsvpDeadline)) setClosed();
 

@@ -377,3 +377,12 @@ footer a { font-weight: 700; display: inline-block; min-height: 44px; line-heigh
 .contact { font-size: 1.125rem; }
 .contact a { color: var(--lawn); }
 .refreshed { color: var(--muted); font-size: 0.95rem; }
+
+.nudge {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--paper);
+  border: 1.5px solid var(--lawn);
+}
+.nudge p { margin: 0 0 12px; font-size: 1.0625rem; }
