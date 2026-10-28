@@ -27,7 +27,7 @@ export default {
   contact: { name: 'Uncle Gilly', phone: '0725 433 625' },
 
   // The Apps Script /exec URL. Empty = preview mode (replies saved on this device only).
-  apiUrl: 'https://script.google.com/macros/s/AKfycbwUqcEBpskePpFLpmXhzCGfnS5njbicf-JAuxeJHl6tDF-v_DN9U-7T5bWnt8aZ3lu4Pw/exec',
+  apiUrl: 'https://script.google.com/macros/s/AKfycbwxWPvop-dn4QSdOak6hu9minYNr9ZWjN751vy4wgX8ZbhMO2XhBUgDQvYH--mJk33-OQ/exec',
 
   // The public link people share. Empty = the address the page was opened from.
   siteUrl: 'https://ongaria-homecoming.netlify.app/',
