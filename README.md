@@ -51,6 +51,7 @@ clasp push
    | `SHOW_PUBLIC_LISTS` | `false` | Only the hosts see names, in the sheet |
    | `SHOW_PUBLIC_MESSAGES` | `false` | Messages go to the hosts only |
    | `CONTACT` | `Uncle Gilly on 0725 433 625` | Used in the "Replies closed" message |
+   | `DATE_OPTIONS` | (not set) | Optional JSON list of days people can pick; unset means 26 Dec 2026 to 1 Jan 2027, matching `dateOptions` in `config.js` |
 
 4. Deploy → **New deployment** → type **Web app**, with Execute as: **Me** and Who has access: **Anyone**. Copy the `/exec` URL into `apiUrl` in `web/config.js`.
 

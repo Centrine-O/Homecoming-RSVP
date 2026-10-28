@@ -30,7 +30,7 @@ function toCount(value, fallback, min, max) {
 }
 
 // BR-01. Returns {ok:true, reply}, {ok:true, spam:true} or {ok:false, field, error}.
-export function validateReply(input, { branches, otherBranch }) {
+export function validateReply(input, { branches, otherBranch, dateOptions = [] }) {
   const data = input || {};
   if (String(data.website ?? '').trim() !== '') return { ok: true, spam: true };
 
@@ -52,8 +52,27 @@ export function validateReply(input, { branches, otherBranch }) {
   const adults = declined ? 0 : toCount(data.adults, 1, 1, LIMITS.countMax);
   const children = declined ? 0 : toCount(data.children, 0, 0, LIMITS.countMax);
   const message = String(data.message ?? '').trim().slice(0, LIMITS.messageMax);
+  const dates = status === 'attending' ? cleanDates(data.dates, dateOptions) : [];
 
-  return { ok: true, reply: { name, branch, status, adults, children, message } };
+  return { ok: true, reply: { name, branch, status, adults, children, message, dates } };
+}
+
+// Optional "days that work for you", only for people who are coming. Unknown days are dropped,
+// duplicates removed, and the rest kept in calendar order. Never an error: the question is optional.
+export function cleanDates(dates, dateOptions = []) {
+  const picked = new Set(Array.isArray(dates) ? dates.map(String) : []);
+  return dateOptions.filter((d) => picked.has(d));
+}
+
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+// 'YYYY-MM-DD' → 'Sat 26 Dec'
+export function dateLabel(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+  if (!m) return String(iso || '');
+  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  return `${WEEKDAYS[d.getUTCDay()]} ${d.getUTCDate()} ${MONTHS_SHORT[d.getUTCMonth()]}`;
 }
 
 // BR-02. Text that a spreadsheet would treat as a formula is stored as text.

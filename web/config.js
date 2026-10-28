@@ -15,6 +15,10 @@ export default {
   branches: [],
   otherBranchLabel: '',
 
+  // Optional "days that work for you", shown only to people who pick Coming. Keep in step with the
+  // DATE_OPTIONS script property if you set one (unset, the server uses these same seven days).
+  dateOptions: ['2026-12-26', '2026-12-27', '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01'],
+
   rsvpDeadline: '',                        // 'YYYY-MM-DD'; replies close at the end of that day, Nairobi time
   showPublicLists: false,                  // false = names visible to the hosts only, in the sheet
   showPublicMessages: false,

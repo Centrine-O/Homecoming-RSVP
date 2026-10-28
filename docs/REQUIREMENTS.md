@@ -83,6 +83,7 @@ Must items make up the minimum version. Should and Could items are added only if
 | FR-18 | Add an optional overnight stay field and count | Could |
 | FR-19 | Add a Kiswahili language toggle | Could |
 | FR-20 | Add a host-only view behind a PIN, if replies are made private (Q7) | Could |
+| FR-21 | When Coming is selected, optionally pick the days that work, from Sat 26 Dec to Fri 1 Jan (any number). Stored in column J (Dates) as labels like "Sat 26 Dec"; the Summary tab counts replies and people per day | Must (added 28 Oct) |
 
 ## 5. Non-functional requirements
 
@@ -119,6 +120,7 @@ One Google Sheet holds the data, with one tab named `RSVPs` and one row per repl
 | G | Message | Text | Optional; up to 500 characters |
 | H | Key | Text | Hidden; `lower(name) + "\|" + branch` |
 | I | Created | Date-time | Set once, on the first submission only |
+| J | Dates | Text | Optional; days that work, e.g. "Sat 26 Dec, Mon 28 Dec"; only for attending (FR-21) |
 
 **Status values**
 

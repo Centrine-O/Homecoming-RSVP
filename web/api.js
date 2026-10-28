@@ -71,7 +71,9 @@ function previewPost(payload) {
     const error = closedMessage(formatIsoDate(CONFIG.rsvpDeadline), contactText(CONFIG.contact));
     return { ok: false, code: 'closed', error };
   }
-  const v = validateReply(payload, { branches: CONFIG.branches, otherBranch: CONFIG.otherBranchLabel });
+  const v = validateReply(payload, {
+    branches: CONFIG.branches, otherBranch: CONFIG.otherBranchLabel, dateOptions: CONFIG.dateOptions,
+  });
   if (!v.ok) return { ok: false, code: 'validation', field: v.field, error: v.error };
   if (v.spam) return { ok: true, updated: false };
   const rows = readPreview();

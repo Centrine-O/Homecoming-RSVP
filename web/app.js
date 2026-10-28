@@ -3,7 +3,7 @@ import CONFIG from './config.js';
 import * as api from './api.js';
 import {
   STATUSES, STATUS_LABELS, LIMITS, validateReply, computeTotals, branchCoverage, sortForList,
-  partySize, messagesForWall, isClosed, closedMessage, formatIsoDate, contactText, usesBranches,
+  partySize, messagesForWall, isClosed, closedMessage, formatIsoDate, contactText, usesBranches, dateLabel,
 } from './logic.js';
 
 const REFRESH_MS = 60000;
@@ -11,7 +11,7 @@ const COOLDOWN_MS = 10000; // BR-11
 const LAST_REPLY_KEY = 'rsvp:last-reply';
 const LAST_SENT_KEY = 'rsvp:last-sent';
 const SAVE_ERROR = "Your reply wasn't sent. Check your connection and try again.";
-const RULES = { branches: CONFIG.branches, otherBranch: CONFIG.otherBranchLabel };
+const RULES = { branches: CONFIG.branches, otherBranch: CONFIG.otherBranchLabel, dateOptions: CONFIG.dateOptions || [] };
 
 const $ = (id) => document.getElementById(id);
 const form = $('form');
@@ -79,6 +79,14 @@ function fillEventDetails() {
   for (const b of [...CONFIG.branches, CONFIG.otherBranchLabel].filter(Boolean)) {
     $('branch').append(new Option(b, b));
   }
+  for (const iso of RULES.dateOptions) {
+    const [weekday, ...rest] = dateLabel(iso).split(' ');
+    $('date-options').append(el('label', { class: 'day' },
+      el('input', { type: 'checkbox', name: 'dates', value: iso }),
+      el('span', { class: 'day-face' },
+        el('span', { class: 'day-name' }, weekday),
+        el('span', { class: 'day-date' }, rest.join(' ')))));
+  }
   if (CONFIG.rsvpDeadline) {
     $('deadline-note').textContent = `Please reply by ${formatIsoDate(CONFIG.rsvpDeadline)}.`;
     $('deadline-note').hidden = false;
@@ -107,6 +115,7 @@ function readForm() {
     adults: data.get('adults') ?? '',
     children: data.get('children') ?? '',
     message: data.get('message') ?? '',
+    dates: data.getAll('dates'),
     website: data.get('website') ?? '',
   };
 }
@@ -118,12 +127,16 @@ function fillForm(reply) {
   form.elements.adults.value = reply.status === 'declined' ? 1 : reply.adults;
   form.elements.children.value = reply.status === 'declined' ? 0 : reply.children;
   form.elements.message.value = reply.message || '';
+  const dates = reply.dates || [];
+  for (const box of form.querySelectorAll('input[name="dates"]')) box.checked = dates.includes(box.value);
   syncCounts();
   syncMessageCount();
 }
 
 function syncCounts() {
   $('counts').hidden = form.elements.status.value === 'declined'; // FR-04
+  // Days that work only matter for people who are coming; the answers stay ticked if they switch back.
+  $('dates-field').hidden = form.elements.status.value !== 'attending' || RULES.dateOptions.length === 0;
 }
 
 function syncMessageCount() {
@@ -234,6 +247,9 @@ function showConfirmation(reply, returning) {
   const size = partySize(reply);
   list.append(size ? `, for ${size}.` : '.');
   if (reply.status === 'tentative') list.append(' Come back and change your reply once you know.');
+  if (reply.status === 'attending' && reply.dates?.length) {
+    list.append(' Days that work for you: ', el('strong', {}, reply.dates.map(dateLabel).join(', ')), '.');
+  }
 
   form.hidden = true;
   $('confirmation').hidden = false;

@@ -9,16 +9,21 @@
  *   SHOW_PUBLIC_LISTS    "true" or "false"
  *   SHOW_PUBLIC_MESSAGES "true" or "false"
  *   CONTACT              e.g. "Peter on 0700 000 000" (used in the closed message)
+ *   DATE_OPTIONS         optional JSON array of YYYY-MM-DD days people can pick when coming;
+ *                        unset = DEFAULT_DATE_OPTIONS below. Keep in step with dateOptions in config.js.
  *
  * Validation mirrors web/logic.js (Apps Script cannot import it). Change both together.
  */
 
 var SHEET_NAME = 'RSVPs';
 var SUMMARY_NAME = 'Summary';
-var HEADERS = ['Updated', 'Name', 'Branch', 'Status', 'Adults', 'Children', 'Message', 'Key', 'Created'];
+var HEADERS = ['Updated', 'Name', 'Branch', 'Status', 'Adults', 'Children', 'Message', 'Key', 'Created', 'Dates'];
+var DATES_COL = 10; // J: optional days that work, added after Created so earlier columns never move
+var DEFAULT_DATE_OPTIONS = ['2026-12-26', '2026-12-27', '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01'];
 var STATUSES = ['attending', 'tentative', 'declined'];
 var LIMITS = { nameMin: 2, nameMax: 80, countMax: 30, messageMax: 500 };
 var LOCK_MS = 10000;
+var WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
   'September', 'October', 'November', 'December'];
 var SERVER_ERROR = { ok: false, code: 'server', error: 'The reply could not be saved. Try again.' };
@@ -85,7 +90,14 @@ function config_() {
   } catch (err) {
     console.error('BRANCHES is not valid JSON');
   }
+  var dateOptions = DEFAULT_DATE_OPTIONS;
+  try {
+    if (p.getProperty('DATE_OPTIONS')) dateOptions = JSON.parse(p.getProperty('DATE_OPTIONS'));
+  } catch (err) {
+    console.error('DATE_OPTIONS is not valid JSON');
+  }
   return {
+    dateOptions: Array.isArray(dateOptions) ? dateOptions.map(String) : DEFAULT_DATE_OPTIONS,
     branches: Array.isArray(branches) ? branches.map(String) : [],
     otherBranch: p.getProperty('OTHER_BRANCH') || '',
     deadline: (p.getProperty('RSVP_DEADLINE') || '').trim(),
@@ -140,9 +152,24 @@ function validateReply_(data, cfg) {
       status: status,
       adults: declined ? 0 : toCount_(data.adults, 1, 1, LIMITS.countMax),
       children: declined ? 0 : toCount_(data.children, 0, 0, LIMITS.countMax),
-      message: String(data.message == null ? '' : data.message).trim().slice(0, LIMITS.messageMax)
+      message: String(data.message == null ? '' : data.message).trim().slice(0, LIMITS.messageMax),
+      dates: status === 'attending' ? cleanDates_(data.dates, cfg.dateOptions) : []
     }
   };
+}
+
+// Optional days that work: only for Coming; unknown days dropped, calendar order, no duplicates.
+function cleanDates_(dates, dateOptions) {
+  var picked = Array.isArray(dates) ? dates.map(String) : [];
+  return dateOptions.filter(function (d) { return picked.indexOf(d) !== -1; });
+}
+
+// 'YYYY-MM-DD' → 'Sat 26 Dec'
+function dateLabel_(iso) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+  if (!m) return String(iso || '');
+  var d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+  return WEEKDAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONTHS[d.getUTCMonth()].slice(0, 3);
 }
 
 // BR-02
@@ -239,11 +266,13 @@ function upsert_(reply) {
     var now = new Date();
     var values = [now, reply.name, reply.branch, reply.status, reply.adults, reply.children, reply.message, key]
       .map(escapeFormula_);
+    var dates = reply.dates.map(dateLabel_).join(', ');
     var row = findRow_(sheet, key);
     if (row) {
       sheet.getRange(row, 1, 1, values.length).setValues([values]); // column I (Created) untouched
+      sheet.getRange(row, DATES_COL).setValue(dates);
     } else {
-      sheet.appendRow(values.concat([now]));
+      sheet.appendRow(values.concat([now, dates]));
     }
     SpreadsheetApp.flush();
     return { ok: true, updated: row > 0 };
@@ -298,6 +327,20 @@ function setup() {
   summary.getRange('A1').setFontWeight('bold');
   summary.getRange('A8').setFontWeight('bold');
   summary.setColumnWidth(1, 220);
+
+  // Days that work, counted over people who are coming
+  var dateOptions = config_().dateOptions;
+  var dayRows = [['Days that work', 'Replies', 'People']].concat(dateOptions.map(function (iso) {
+    var crit = '"*' + dateLabel_(iso) + '*"';
+    return [
+      dateLabel_(iso),
+      '=COUNTIFS(RSVPs!D:D,"attending",RSVPs!J:J,' + crit + ')',
+      '=SUMIFS(RSVPs!E:E,RSVPs!D:D,"attending",RSVPs!J:J,' + crit + ')+SUMIFS(RSVPs!F:F,RSVPs!D:D,"attending",RSVPs!J:J,' + crit + ')'
+    ];
+  }));
+  summary.getRange(1, 4, dayRows.length, 3).setValues(dayRows);
+  summary.getRange(1, 4, 1, 3).setFontWeight('bold');
+  summary.setColumnWidth(4, 160);
 
   // Drop the blank default tab a new spreadsheet comes with.
   var blank = ss.getSheetByName('Sheet1');

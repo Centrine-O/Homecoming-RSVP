@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   validateReply, computeTotals, branchCoverage, sortForList,
   cleanName, makeKey, partySize, messagesForWall, isClosed, closedMessage,
-  escapeFormula, STATUS_LABELS, formatIsoDate, contactText, usesBranches,
+  escapeFormula, STATUS_LABELS, formatIsoDate, contactText, usesBranches, cleanDates, dateLabel,
 } from '../web/logic.js';
 
 const BRANCHES = ['Family of Ann', 'Family of Ben', 'Family of Cate'];
@@ -17,7 +17,7 @@ describe('BR-01 validateReply: name', () => {
   test('accepts a normal reply and returns cleaned values', () => {
     const r = v({});
     assert.equal(r.ok, true);
-    assert.deepEqual(r.reply, { name: 'Wanjiru Kamau', branch: 'Family of Ben', status: 'attending', adults: 2, children: 3, message: '' });
+    assert.deepEqual(r.reply, { name: 'Wanjiru Kamau', branch: 'Family of Ben', status: 'attending', adults: 2, children: 3, message: '', dates: [] });
   });
   test('trims and collapses internal spaces', () => {
     assert.equal(v({ name: '   Wanjiru    \t Kamau  ' }).reply.name, 'Wanjiru Kamau');
@@ -112,6 +112,31 @@ describe('BR-01 validateReply: message and honeypot', () => {
   });
   test('honeypot wins even when the rest is invalid', () => {
     assert.deepEqual(v({ name: '', website: 'x' }), { ok: true, spam: true });
+  });
+});
+
+describe('optional days that work', () => {
+  const DAYS = ['2026-12-26', '2026-12-27', '2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01'];
+  const withDays = (over) => validateReply({ ...base, ...over }, { ...opts, dateOptions: DAYS });
+
+  test('kept for Coming, in calendar order, without duplicates or unknown days', () => {
+    const r = withDays({ dates: ['2027-01-01', '2026-12-26', '2026-12-26', '2026-12-25', 'soon'] });
+    assert.deepEqual(r.reply.dates, ['2026-12-26', '2027-01-01']);
+  });
+  test('dropped for Not sure yet and Can\'t make it', () => {
+    assert.deepEqual(withDays({ status: 'tentative', dates: ['2026-12-26'] }).reply.dates, []);
+    assert.deepEqual(withDays({ status: 'declined', dates: ['2026-12-26'] }).reply.dates, []);
+  });
+  test('optional: missing or junk input is an empty list, never an error', () => {
+    assert.deepEqual(withDays({ dates: undefined }).reply.dates, []);
+    assert.deepEqual(withDays({ dates: '2026-12-26' }).reply.dates, []);
+    assert.equal(withDays({ dates: 42 }).ok, true);
+  });
+  test('cleanDates and dateLabel', () => {
+    assert.deepEqual(cleanDates(['2026-12-27'], DAYS), ['2026-12-27']);
+    assert.deepEqual(cleanDates(['2026-12-27']), []);
+    assert.deepEqual(DAYS.map(dateLabel),
+      ['Sat 26 Dec', 'Sun 27 Dec', 'Mon 28 Dec', 'Tue 29 Dec', 'Wed 30 Dec', 'Thu 31 Dec', 'Fri 1 Jan']);
   });
 });
 

@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const SOURCE = readFileSync(new URL('../backend/Code.gs', import.meta.url), 'utf8');
-const HEADERS = ['Updated', 'Name', 'Branch', 'Status', 'Adults', 'Children', 'Message', 'Key', 'Created'];
+const HEADERS = ['Updated', 'Name', 'Branch', 'Status', 'Adults', 'Children', 'Message', 'Key', 'Created', 'Dates'];
 
 // Mimics how Sheets stores a value: a leading apostrophe forces text and is not kept;
 // any other string starting with "=" becomes a live formula.
@@ -23,6 +23,7 @@ class FakeSheet {
     return {
       getValues: () => this.data.slice(r - 1, r - 1 + nr).map((row) => row.slice(c - 1, c - 1 + nc)),
       setValues: (vals) => vals.forEach((v, i) => v.forEach((x, j) => { this.data[r - 1 + i][c - 1 + j] = store(x); })),
+      setValue: (x) => { this.data[r - 1][c - 1] = store(x); },
     };
   }
   appendRow(v) { this.data.push(Array.from(v, store)); } // Array.from: keep arrays in this realm
@@ -90,6 +91,29 @@ describe('POST upsert (BR-03)', () => {
     assert.equal(sheet.data[1][4], 0);
     assert.equal(sheet.data[1][5], 0);
     assert.equal(sheet.data[1][8], created);
+  });
+
+  test('days that work go in column J as readable labels; updates replace them, Created kept', () => {
+    post(reply({ dates: ['2027-01-01', '2026-12-26', '2026-12-20'] }));
+    assert.equal(sheet.data[1][9], 'Sat 26 Dec, Fri 1 Jan');
+    const created = sheet.data[1][8];
+    post(reply({ dates: ['2026-12-28'] }));
+    assert.equal(sheet.data[1][9], 'Mon 28 Dec');
+    assert.equal(sheet.data[1][8], created);
+    post(reply({ status: 'tentative', dates: ['2026-12-28'] }));
+    assert.equal(sheet.data[1][9], '', 'days only kept for Coming');
+    assert.equal(sheet.data.length, 2);
+  });
+
+  test('no days picked leaves column J empty', () => {
+    post(reply());
+    assert.equal(sheet.data[1][9], '');
+  });
+
+  test('DATE_OPTIONS script property overrides the default days', () => {
+    load({ DATE_OPTIONS: JSON.stringify(['2026-12-20']) });
+    post(reply({ dates: ['2026-12-20', '2026-12-26'] }));
+    assert.equal(sheet.data[1][9], 'Sun 20 Dec');
   });
 
   test('a different branch creates a new row', () => {
