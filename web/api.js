@@ -1,7 +1,7 @@
 // Talks to the Apps Script web app, or to localStorage in preview mode (apiUrl empty).
 import CONFIG from './config.js';
 import {
-  validateReply, makeKey, isClosed, computeTotals, branchCoverage, closedMessage, formatIsoDate, contactText,
+  validateReply, makeKey, isClosed, computeTotals, branchCoverage, comingNames, closedMessage, formatIsoDate, contactText,
 } from './logic.js';
 
 export const previewMode = !CONFIG.apiUrl;
@@ -62,6 +62,7 @@ function previewGet() {
   } else {
     out.totals = computeTotals(rows);
     out.coverage = branchCoverage(rows, CONFIG.branches);
+    if (CONFIG.showComingNames) out.coming = comingNames(rows);
   }
   return out;
 }

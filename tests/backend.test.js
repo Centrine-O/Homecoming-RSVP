@@ -232,6 +232,24 @@ describe('GET (section 8, BR-09, BR-10)', () => {
     ]);
   });
 
+  test('SHOW_COMING_NAMES=true adds only the names of people coming, A–Z', () => {
+    load({ SHOW_PUBLIC_LISTS: 'false', SHOW_COMING_NAMES: 'true' });
+    post(reply({ name: 'Zawadi Ong\'aria' }));
+    post(reply({ name: 'Baraka', status: 'declined' }));
+    post(reply({ name: 'Akinyi', status: 'tentative' }));
+    post(reply({ name: 'amani' }));
+    const g = get();
+    assert.deepEqual(g.coming, ['amani', "Zawadi Ong'aria"]);
+    assert.equal(g.rows, undefined);
+    assert.ok(!JSON.stringify(g).includes('Baraka') && !JSON.stringify(g).includes('Akinyi'));
+  });
+
+  test('without SHOW_COMING_NAMES no names are sent', () => {
+    load({ SHOW_PUBLIC_LISTS: 'false' });
+    post(reply());
+    assert.equal(get().coming, undefined);
+  });
+
   test('skips rows a host blanked out in the sheet', () => {
     load();
     post(reply());

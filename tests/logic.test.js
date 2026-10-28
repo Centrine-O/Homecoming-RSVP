@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   validateReply, computeTotals, branchCoverage, sortForList,
   cleanName, makeKey, partySize, messagesForWall, isClosed, closedMessage,
-  escapeFormula, STATUS_LABELS, formatIsoDate, contactText, usesBranches, cleanDates, dateLabel,
+  escapeFormula, STATUS_LABELS, formatIsoDate, contactText, usesBranches, cleanDates, dateLabel, comingNames, initials,
 } from '../web/logic.js';
 
 const BRANCHES = ['Family of Ann', 'Family of Ben', 'Family of Cate'];
@@ -223,6 +223,25 @@ describe('BR-08 sortForList', () => {
     const g = sortForList([...FIXTURE, { name: 'X', branch: 'Family of Ann', status: 'maybe' }], BRANCHES);
     assert.deepEqual(FIXTURE, copy);
     assert.equal(g.attending.length + g.tentative.length + g.declined.length, 10);
+  });
+});
+
+describe('comingNames and initials', () => {
+  test('only Coming names, A–Z, each once, cleaned', () => {
+    const rows = [
+      ...FIXTURE,
+      { name: '  zawadi  ', status: 'attending' },
+      { name: 'Wanjiru   Kamau', status: 'attending' },
+    ];
+    assert.deepEqual(comingNames(rows), ['Ali', 'Amani', 'Chebet', 'Mwangi', 'Otieno', 'Wanjiru Kamau', 'Zawadi']);
+  });
+  test('empty when nobody is coming', () => {
+    assert.deepEqual(comingNames(FIXTURE.filter((r) => r.status !== 'attending')), []);
+  });
+  test('initials use first and last name', () => {
+    assert.equal(initials('Wanjiru Kamau'), 'WK');
+    assert.equal(initials('mary  atieno  ong\'aria'), 'MO');
+    assert.equal(initials('Otieno'), 'O');
   });
 });
 

@@ -22,6 +22,7 @@ export default {
   rsvpDeadline: '',                        // 'YYYY-MM-DD'; replies close at the end of that day, Nairobi time
   showPublicLists: false,                  // false = names visible to the hosts only, in the sheet
   showPublicMessages: false,
+  showComingNames: true,                   // with lists private: after replying, people can see who else is coming (names only)
 
   contact: { name: 'Uncle Gilly', phone: '0725 433 625' },
 

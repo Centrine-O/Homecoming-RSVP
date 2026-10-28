@@ -4,6 +4,7 @@ import * as api from './api.js';
 import {
   STATUSES, STATUS_LABELS, LIMITS, validateReply, computeTotals, branchCoverage, sortForList,
   partySize, messagesForWall, isClosed, closedMessage, formatIsoDate, contactText, usesBranches, dateLabel,
+  comingNames, initials, cleanName,
 } from './logic.js';
 
 const REFRESH_MS = 60000;
@@ -22,6 +23,7 @@ let loading = false;
 let sending = false;
 let closed = false;
 let cooldownTimer = null;
+let coming = null; // names of people coming, from the server (null until loaded)
 
 // ---------- Small helpers ----------
 
@@ -68,6 +70,7 @@ function fillEventDetails() {
     // Hosts only: no names and no numbers on the page, just the note saying so.
     for (const id of ['who-title', 'totals', 'lists', 'refreshed']) $(id).hidden = true;
     $('private-note').hidden = false;
+    if (CONFIG.showComingNames) $('private-note').textContent = 'Send your reply to see who else is coming.';
   }
   if (!CONFIG.showPublicMessages || !CONFIG.showPublicLists) {
     $('message-label').textContent = 'A message for the hosts';
@@ -251,13 +254,55 @@ function showConfirmation(reply, returning) {
     list.append(' Days that work for you: ', el('strong', {}, reply.dates.map(dateLabel).join(', ')), '.');
   }
 
+  $('see-coming').hidden = !canSeeComing();
+  renderComing();
+
   // People who said Coming before the days question existed: point them to it.
-  $('days-nudge').hidden = closed || reply.status !== 'attending'
+  $('days-nudge').hidden = !returning || closed || reply.status !== 'attending'
     || (reply.dates?.length ?? 0) > 0 || RULES.dateOptions.length === 0;
 
   form.hidden = true;
   $('confirmation').hidden = false;
   if (!returning) $('confirmation').focus();
+}
+
+// ---------- Who's coming (names only, for people who have replied) ----------
+
+const FACE_TONES = 4;
+
+function canSeeComing() {
+  return CONFIG.showComingNames && !CONFIG.showPublicLists && Boolean(storage.get(LAST_REPLY_KEY));
+}
+
+function renderComing() {
+  const show = canSeeComing() && Array.isArray(coming);
+  $('coming-wall').hidden = !show;
+  $('who').hidden = show; // the "send your reply to see…" note is no longer needed
+  if (!show) return;
+
+  const me = cleanName(storage.get(LAST_REPLY_KEY)?.name).toLowerCase();
+  const list = $('coming-names');
+  list.textContent = '';
+  if (coming.length === 0) {
+    list.append(el('li', { class: 'faces-empty' }, "No one has said they're coming yet."));
+    return;
+  }
+  for (const name of coming) {
+    const tone = [...name].reduce((sum, ch) => sum + ch.codePointAt(0), 0) % FACE_TONES;
+    const isMe = name.toLowerCase() === me;
+    list.append(el('li', { class: isMe ? 'face is-me' : 'face' },
+      el('span', { class: `initials tone-${tone}`, 'aria-hidden': 'true' }, initials(name)),
+      el('span', { class: 'face-name' }, name),
+      isMe ? el('span', { class: 'you' }, 'You') : null));
+  }
+}
+
+function seeComing() {
+  renderComing();
+  if (!Array.isArray(coming)) refresh();
+  $('coming-wall').hidden = false;
+  $('coming-wall').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  $('coming-wall').focus({ preventScroll: true });
 }
 
 function pickDays() {
@@ -362,6 +407,8 @@ function render(data) {
   } else {
     // BR-10: the server sent counts only. The page shows none of them, only that replies are private.
     renderCoverage(data.coverage);
+    coming = Array.isArray(data.coming) ? data.coming : null;
+    renderComing();
     $('lists').hidden = true;
     $('messages').hidden = true;
     $('private-note').hidden = false;
@@ -409,6 +456,7 @@ function init() {
   for (const b of form.querySelectorAll('.step')) b.addEventListener('click', () => stepCount(b));
   $('change').addEventListener('click', changeReply);
   $('pick-days').addEventListener('click', pickDays);
+  $('see-coming').addEventListener('click', seeComing);
 
   if (isClosed(CONFIG.rsvpDeadline)) setClosed();
 

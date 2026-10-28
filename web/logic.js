@@ -136,6 +136,29 @@ export function partySize({ status, adults, children }) {
   return parts.join(', ');
 }
 
+// Names of people who said Coming, A–Z, each once. Nothing else about them is shared.
+export function comingNames(rows) {
+  const seen = new Set();
+  const names = [];
+  for (const r of rows) {
+    if (r.status !== 'attending') continue;
+    const name = cleanName(r.name);
+    const k = name.toLowerCase();
+    if (name && !seen.has(k)) {
+      seen.add(k);
+      names.push(name);
+    }
+  }
+  return names.sort(byText);
+}
+
+// 'Wanjiru Kamau' → 'WK'; 'Otieno' → 'O'
+export function initials(name) {
+  const parts = cleanName(name).split(' ').filter(Boolean);
+  const pick = parts.length > 1 ? [parts[0], parts[parts.length - 1]] : parts;
+  return pick.map((p) => [...p][0].toUpperCase()).join('');
+}
+
 // BR-09
 export function messagesForWall(rows) {
   return rows

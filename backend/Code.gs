@@ -8,6 +8,8 @@
  *   RSVP_DEADLINE        YYYY-MM-DD (end of that day, Nairobi time); empty = never closes
  *   SHOW_PUBLIC_LISTS    "true" or "false"
  *   SHOW_PUBLIC_MESSAGES "true" or "false"
+ *   SHOW_COMING_NAMES    "true" = when lists are private, still send the names of people coming
+ *                        (names only, A–Z) for the "Who's coming" panel; anything else = no names
  *   CONTACT              e.g. "Peter on 0700 000 000" (used in the closed message)
  *   DATE_OPTIONS         optional JSON array of YYYY-MM-DD days people can pick when coming;
  *                        unset = DEFAULT_DATE_OPTIONS below. Keep in step with dateOptions in config.js.
@@ -46,6 +48,7 @@ function doGet() {
       // BR-10: no names leave the server.
       out.totals = computeTotals_(rows);
       out.coverage = branchCoverage_(rows, cfg.branches);
+      if (cfg.showComingNames) out.coming = comingNames_(rows);
     }
     return json_(out);
   } catch (err) {
@@ -103,6 +106,7 @@ function config_() {
     deadline: (p.getProperty('RSVP_DEADLINE') || '').trim(),
     showLists: p.getProperty('SHOW_PUBLIC_LISTS') !== 'false',
     showMessages: p.getProperty('SHOW_PUBLIC_MESSAGES') !== 'false',
+    showComingNames: p.getProperty('SHOW_COMING_NAMES') === 'true',
     contact: p.getProperty('CONTACT') || 'the hosts'
   };
 }
@@ -208,6 +212,22 @@ function computeTotals_(rows) {
   });
   t.coming = t.adults + t.children;
   return t;
+}
+
+// Names of people coming, A–Z, each once (mirrors comingNames in web/logic.js)
+function comingNames_(rows) {
+  var seen = {};
+  var names = [];
+  rows.forEach(function (r) {
+    if (r.status !== 'attending') return;
+    var name = cleanName_(r.name);
+    var k = name.toLowerCase();
+    if (name && !seen[k]) {
+      seen[k] = true;
+      names.push(name);
+    }
+  });
+  return names.sort(function (a, b) { return a.localeCompare(b, undefined, { sensitivity: 'base' }); });
 }
 
 // BR-07
@@ -354,6 +374,7 @@ function setup() {
     RSVP_DEADLINE: '',
     SHOW_PUBLIC_LISTS: 'false',
     SHOW_PUBLIC_MESSAGES: 'false',
+    SHOW_COMING_NAMES: 'true',
     CONTACT: 'Uncle Gilly on 0725 433 625'
   };
   Object.keys(defaults).forEach(function (k) {

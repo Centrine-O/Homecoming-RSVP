@@ -84,6 +84,7 @@ Must items make up the minimum version. Should and Could items are added only if
 | FR-19 | Add a Kiswahili language toggle | Could |
 | FR-20 | Add a host-only view behind a PIN, if replies are made private (Q7) | Could |
 | FR-21 | When Coming is selected, optionally pick the days that work, from Sat 26 Dec to Fri 1 Jan (any number). Stored in column J (Dates) as labels like "Sat 26 Dec"; the Summary tab counts replies and people per day | Must (added 28 Oct) |
+| FR-22 | After replying, people can tap "See who's coming" to see the names of everyone marked Coming (names only, A–Z, no counts). Before replying they see "Send your reply to see who else is coming." Server sends the names only when SHOW_COMING_NAMES is true | Must (added 28 Oct) |
 
 ## 5. Non-functional requirements
 

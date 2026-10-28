@@ -163,6 +163,7 @@
               <button id="pick-days" type="button" class="btn btn-primary">Pick the days that work</button>
             </div>
             <div class="actions">
+              <button id="see-coming" type="button" class="btn btn-outline" hidden>See who's coming</button>
               <a id="share" class="btn btn-share" target="_blank" rel="noopener">Share on WhatsApp</a>
               <button id="change" type="button" class="link-btn">Change my reply</button>
             </div>
@@ -188,6 +189,12 @@
               <ul></ul>
             </div>
           </div>
+        </section>
+
+        <section id="coming-wall" class="coming-wall" aria-labelledby="coming-title" tabindex="-1" hidden>
+          <h2 id="coming-title">Who's coming</h2>
+          <p class="hint">Family who have said they'll be there. If someone is missing, forward them the link.</p>
+          <ul id="coming-names" class="faces"></ul>
         </section>
 
         <section id="branches" aria-labelledby="branches-title">
