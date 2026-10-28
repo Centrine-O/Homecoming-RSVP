@@ -299,7 +299,13 @@ function renderComing() {
 
 function seeComing() {
   renderComing();
-  if (!Array.isArray(coming)) refresh();
+  if (!Array.isArray(coming)) {
+    // List not loaded (offline, or the server isn't sending names): say so rather than show an empty panel.
+    const list = $('coming-names');
+    list.textContent = '';
+    list.append(el('li', { class: 'faces-empty' }, "The list isn't available right now. Try again in a little while."));
+    refresh();
+  }
   $('coming-wall').hidden = false;
   $('coming-wall').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   $('coming-wall').focus({ preventScroll: true });
